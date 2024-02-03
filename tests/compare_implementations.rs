@@ -70,7 +70,7 @@ fn compare_implementations(seqpath: &str, expected: &str) -> Result<()> {
         if exp_start != pred_start
             || exp_end != pred_end
             || exp_conformation != pred_conformation
-            || diff >= 1e-6
+            || diff >= 1e-12
         {
             errors.push(format!(
                 "Incompatible lines ({pred_sequence}: {diff}):\n\

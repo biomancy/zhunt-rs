@@ -1,11 +1,11 @@
 ## Z-Hunt(r)
 
-This repository hosts a Rust port of the [Z-Hunt algorithm](https://pubmed.ncbi.nlm.nih.gov/1601856/) designed for
-predicting the propensity of DNA to adopt a left-handed Z-DNA conformation. Unlike the original implementation, this
-version serves as a library intended for use in Python.
+This repository contains a Rust port of the [Z-Hunt algorithm](https://pubmed.ncbi.nlm.nih.gov/1601856/), which is
+designed to predict the propensity of DNA to adopt a left-handed Z-DNA conformation. Unlike the original implementation,
+this version is intended to be used as a standalone Python library.
 
-While the Rust port is **not** binary compatible with the original C implementation, it maintains functional
-equivalence (refer to the [Compatibility](#compatibility) section).
+This Rust port is fully compatible with the original C implementation. Please refer to
+the [Compatibility](#compatibility) section for more details.
 
 ### Installation
 
@@ -23,8 +23,8 @@ Here is a simple example of how to use the library in Python:
 import zhuntr
 
 sequence = "nATGCGCGCGGCATGC".encode("ASCII")  # The target sequence (only ATGCN are accepted, case insensitive)
-mindn, maxdn = 3, 6                            # Minimum and maximum length of evaluated DNA windows in dinucleotides
-threshold = 1_000                              # Windows with a ZH-score below this threshold will not be reported
+mindn, maxdn = 3, 6  # Minimum and maximum length of evaluated DNA windows in dinucleotides
+threshold = 1_000  # Windows with a ZH-score below this threshold will not be reported
 
 # Make a prediction
 start, end, score, window, conformation = zhuntr.predict(sequence, mindn, maxdn, threshold)
@@ -46,7 +46,8 @@ assert window == ['NATGCGCGCG', 'ATGCGCGCGG', 'TGCGCGCG']
 # conformation: DNA conformation (anti/syn) for each window
 assert conformation == ['ASASASASAS', 'SASASASASA', 'ASASASAS']
 ```
-Note: the default behaviour of the original implementation is to "wrap around" windows at the end of the sequence. 
+
+Note: the default behaviour of the original implementation is to "wrap around" windows at the end of the sequence.
 It can be enabled by passing `wrap=True` to the `predict` function.
 
 The library also supports stream predictions, wherein the sequence is evaluated slice by slice to minimize the memory
@@ -71,18 +72,12 @@ sequence.
 
 ### Compatibility
 
-This version has been tested against the original C implementation with all single-precision floating-point
-types replaced by double-precision types. The output for human mtDNA, a random 1kb sequence, and subsequences of human
-chrY or HSV-1 genome matches identically with the output of the modified C implementation (see tests; 6 digits
-after the decimal point are identical).
+This version has been tested against the original C implementation compiled with all compile optimizations turned off.
+The output for human mtDNA, a random 1kb sequence, and subsequences of human chrY or HSV-1 genome matches the output of
+the C implementation (see tests; 12 digits after the decimal point are identical).
 
-Unfortunately, attempts to match the output of the original implementation with mixed single/double precision
-calculations were unsuccessful. This discrepancy is likely related to how floats are handled by the GCC compiler
-compared to LLVM with default settings. Limited experimentation with float-related compiler flags did not yield a
-solution.
-
-Reference output was generated using the `tests/resources/make-references.sh` script. The reference implementation used
-is also provided in the same folder (`zhunt3-reference.c`).
+Reference outputs were generated using the `tests/resources/make-references.sh` script. The reference implementation
+used is also provided in the same folder (`zhunt3-reference.c`).
 
 ### Development
 

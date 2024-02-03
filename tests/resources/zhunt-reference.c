@@ -161,9 +161,9 @@ FILE *open_file(int mode, char *filename, char *typestr);
 
 void assign_bzenergy_index(int nucleotides, char seq[]);
 
-void best_anti_syn(int dinucleotides, double esum);
+void best_anti_syn(int dinucleotides, float esum);
 
-void anti_syn_energy(int din, int dinucleotides, double esum);
+void anti_syn_energy(int din, int dinucleotides, float esum);
 
 unsigned input_sequence(FILE *file, int nucleotides, int showfile);
 
@@ -282,12 +282,12 @@ void assign_bzenergy_index(int nucleotides, char seq[]) {
 
 
 double *bzenergy, *best_bzenergy;       /* dinucleotides */
-double best_esum;               /* assigned before call to anti_syn_energy() */
+float best_esum;               /* assigned before call to anti_syn_energy() */
 char *best_antisyn, *antisyn;         /* nucleotides */
 
 
 
-void best_anti_syn(int dinucleotides, double esum) {
+void best_anti_syn(int dinucleotides, float esum) {
     int i;
     double dl, slope;
 
@@ -300,9 +300,9 @@ void best_anti_syn(int dinucleotides, double esum) {
 }
 
 
-void anti_syn_energy(int din, int dinucleotides, double esum) {
+void anti_syn_energy(int din, int dinucleotides, float esum) {
     int i, nucleotides;
-    double e;
+    float e;
 
     nucleotides = 2 * din;
 

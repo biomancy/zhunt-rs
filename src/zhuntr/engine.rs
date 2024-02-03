@@ -14,7 +14,7 @@ pub enum TailExtension<'a> {
 
 #[derive(Debug, Clone, Default)]
 struct State {
-    pub esum: f64,
+    pub esum: f32,
     pub bzenergy: Vec<f64>,
     pub conformation: Vec<DiNucleotide>,
 }
@@ -200,7 +200,7 @@ impl Engine {
         } else {
             dbzed(Some(self.cache.conformation[dn - 1]), DiNucleotide::AS)
         };
-        let energy = DBZED[i][self.bzindex[dn]];
+        let energy = DBZED[i][self.bzindex[dn]] as f32;
 
         self.cache.esum += energy;
         self.cache.bzenergy[dn] = self.expdbzed[i][self.bzindex[dn]];
@@ -214,9 +214,17 @@ impl Engine {
         } else {
             dbzed(Some(self.cache.conformation[dn - 1]), DiNucleotide::SA)
         };
-        let energy = DBZED[i][self.bzindex[dn]];
 
-        self.cache.esum += energy;
+        // This will NOT work correctly because of the way floats are handled in C.
+        // let energy = DBZED[i][self.bzindex[dn]] as f32;
+        // self.cache.esum += energy;
+
+        // Equivalent to the original code behaviour. Adding f64 to f32 in C results in:
+        // 1. f32 is promoted to f64
+        // 2. f64 is added to f64
+        // 3. f64 is demoted to f32
+        self.cache.esum = (self.cache.esum as f64 + DBZED[i][self.bzindex[dn]]) as f32;
+
         self.cache.bzenergy[dn] = self.expdbzed[i][self.bzindex[dn]];
         self.find_optimal_conformation(dn + 1, maxdn);
 
@@ -378,7 +386,7 @@ impl Engine {
         self.reserve(maxdn, buffer);
         self.input_sequence(reader, wrap)?;
 
-        let initial_esum = 10.0 * maxdn as f64;
+        let initial_esum = 10.0 * maxdn as f32;
         for i in 0..self.sequence.len() - 2 * maxdn {
             self.precompute_bzenergy_index(maxdn, i)?;
 
